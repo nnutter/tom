@@ -1,0 +1,155 @@
+[tools]
+go = "1.27.1"
+
+#####################
+# Development Tasks #
+#####################
+
+[tasks.all]
+description = "Run fixers, tests, and linters"
+run = '''
+#!/usr/bin/env bash
+mise run fixers
+mise run tests
+mise run linters
+'''
+
+[tasks.ci-tests]
+alias = "test"
+description = "Run tests (with the race detector)"
+run = "go test -race -shuffle=on ./..."
+
+[tasks.coverage]
+alias = "cover"
+description = "Run tests and generate coverage report"
+run = "go test -coverprofile=coverage.out -covermode=atomic ./... && go tool cover -func=coverage.out"
+
+[tasks.install-hooks]
+description = "Install Lefthook git hooks"
+run = "go tool lefthook install"
+
+[tasks.pre-commit]
+description = "Format staged files"
+usage = 'arg "[staged_files]" var=#true'
+run = '''
+#!/usr/bin/env bash
+go tool gitleaks git --redact --pre-commit --staged
+mise run fixers ${usage_staged_files}
+'''
+
+[tasks.tests]
+alias = "test"
+description = "Run tests (with the race detector)"
+run = "go test -cover ./..."
+
+#############
+# Fix Tasks #
+#############
+
+[tasks.fixers]
+alias = "fix"
+usage = 'arg "[staged_files]" var=#true'
+run = '''
+#!/usr/bin/env bash
+mise run fix-go-mod-tidy
+mise run fix-gofumpt ${usage_staged_files}
+mise run fix-goimports ${usage_staged_files}
+mise run fix-go-fix ${usage_staged_files}
+mise run fix-testifylint
+'''
+
+[tasks.fix-gofumpt]
+description = "Run code formatting tools"
+usage = 'arg "[staged_files]" var=#true'
+run = '''
+#!/usr/bin/env bash
+go tool gofumpt -l -w ${usage_staged_files:-.}
+'''
+
+[tasks.fix-goimports]
+description = "Run code formatting tools"
+usage = 'arg "[staged_files]" var=#true'
+run = '''
+#!/usr/bin/env bash
+go tool goimports -l -w -local $(go list -m) ${usage_staged_files:-.}
+'''
+
+[tasks.fix-go-fix]
+description = "Apply go fix"
+usage = 'arg "[staged_files]" var=#true'
+run = '''
+#!/usr/bin/env bash
+go fix ${usage_staged_files:-./...}
+'''
+
+[tasks.fix-go-mod-tidy]
+description = "Tidy go.mod and go.sum"
+run = "go mod tidy"
+
+[tasks.fix-testifylint]
+description = "Run testifylint static analysis"
+usage = 'arg "[staged_files]" var=#true'
+run = '''
+#!/usr/bin/env bash
+go tool testifylint -fix ${usage_staged_files:-.}
+'''
+
+##############
+# Lint Tasks #
+##############
+
+[tasks.linters]
+alias = "static-analysis"
+run = '''
+#!/usr/bin/env bash
+mise run lint-constable
+mise run lint-errcheck
+mise run lint-gitleaks
+mise run lint-go-check-sumtype
+mise run lint-go-vet
+mise run lint-gosec
+mise run lint-govulncheck
+mise run lint-nilaway
+mise run lint-staticcheck
+mise run lint-testifylint
+'''
+
+[tasks.lint-constable]
+description = "Checks nonmutating directives"
+run = "go tool constable ./..."
+
+[tasks.lint-errcheck]
+description = "Check for unhandled errors"
+run = "go tool errcheck ./..."
+
+[tasks.lint-gitleaks]
+description = "Scan the Git history for secrets"
+run = "go tool gitleaks dir --verbose --redact ."
+
+[tasks.lint-go-check-sumtype]
+description = "Check sealed sum-type switches for exhaustiveness"
+run = "go tool go-check-sumtype ./..."
+
+[tasks.lint-go-vet]
+description = "Run go vet static analysis"
+run = "go vet ./..."
+
+[tasks.lint-gosec]
+description = "Run gosec static analysis"
+run = "go tool gosec -severity high -quiet ./..."
+
+[tasks.lint-govulncheck]
+description = "Check for vulnerabilities"
+run = "go tool govulncheck ./..."
+
+[tasks.lint-nilaway]
+description = "Run nilaway on github.com/nnutter packages"
+run = "go tool nilaway -include-pkgs $(go list -m) ./..."
+
+[tasks.lint-staticcheck]
+description = "Run staticcheck static analysis"
+run = "go tool staticcheck ./..."
+
+[tasks.lint-testifylint]
+description = "Run testifylint static analysis"
+run = "go tool testifylint ./..."
