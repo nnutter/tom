@@ -25,11 +25,20 @@ func TestDepthValueSet(t *testing.T) {
 func TestDepthFlagAcceptsAlias(t *testing.T) {
 	t.Chdir("..")
 	var out bytes.Buffer
-	c := NewRootCmd()
+	c := NewRootCmd("dev")
 	c.SetOut(&out)
 	c.SetArgs([]string{"--depth", "file"})
 	require.NoError(t, c.Execute())
 	assert.Contains(t, out.String(), "package mapgen")
+}
+
+func TestRootCmdVersionFlag(t *testing.T) {
+	var out bytes.Buffer
+	c := NewRootCmd("v1.2.3-test")
+	c.SetOut(&out)
+	c.SetArgs([]string{"--version"})
+	require.NoError(t, c.Execute())
+	assert.Contains(t, out.String(), "v1.2.3-test")
 }
 
 func TestDepthCompletions(t *testing.T) {

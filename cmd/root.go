@@ -10,13 +10,15 @@ import (
 	"github.com/nnutter/tom/internal/mapgen"
 )
 
-// NewRootCmd builds the tom root command.
-func NewRootCmd() *cobra.Command {
+// NewRootCmd builds the tom root command. version is shown by the
+// --version flag; main passes the build-time main.version value here.
+func NewRootCmd(version string) *cobra.Command {
 	var depth depthValue = 1
 	var hideUnexported bool
 	cmd := &cobra.Command{
-		Use:   "tom [package]",
-		Short: "Generate a text map of Go source code structure",
+		Use:     "tom [package]",
+		Version: version,
+		Short:   "Generate a text map of Go source code structure",
 		Long: `tom (tomography) renders the structure of Go source code as a text
 map with successively deeper slices for LLM consumption.
 
@@ -63,6 +65,6 @@ Function metrics render as // comment lines on the declaration.`,
 }
 
 // Execute runs the tom CLI with Fang-enhanced help and errors.
-func Execute() error {
-	return fang.Execute(context.Background(), NewRootCmd())
+func Execute(version string) error {
+	return fang.Execute(context.Background(), NewRootCmd(version), fang.WithVersion(version))
 }
