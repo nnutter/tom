@@ -9,7 +9,10 @@ source = "git@github.com:nnutter/go-template.git"
 [answers]
 copyright_holder = "Nathan Nutter"
 copyright_year = "2026"
+formula_name = "tom"
 go_version = "1.27.1"
 module_path = "github.com/nnutter/tom"
 project_name = "tom"
-with_homebrew = false
+tap_owner = "nnutter"
+tap_repository = "homebrew-tap"
+with_homebrew = true
