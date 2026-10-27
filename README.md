@@ -15,7 +15,7 @@ Otherwise the argument is a package: `tom/cmd` maps one package, `tom/cmd/...` m
 Absolute paths and dot-relative paths are plain directories, which always scan recursively.
 
 | Depth | Slice |
-| ----- | ----- |
+| --- | --- |
 | 0, package | Packages with all import lines: name, directory, file count |
 | 1, file | + top-level declarations with one-line purposes from doc comments (default) |
 | 2, function | + signatures, struct/interface bodies with member doc summaries, methods grouped with their receiver type, and struct tags |
